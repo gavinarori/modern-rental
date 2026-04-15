@@ -2,30 +2,31 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { VideoPlayer } from "../video-player";
 
-const word = "MONO";
+const word = "";
 
 const sideImages = [
   {
-    src: "/images/hero-side-1.png",
+    src: "/images/hero/unified_r1_c1.jpg",
     alt: "Modern architecture with corten steel",
     position: "left",
     span: 1,
   },
   {
-    src: "/images/hero-side-2.png",
+    src: "/images/hero/unified_r1_c2.jpg",
     alt: "Aerial view of modern home",
     position: "left",
     span: 1,
   },
   {
-    src: "/images/hero-side-3.png",
+    src: "/images/hero/unified_r1_c3.jpg",
     alt: "Interior view with landscape",
     position: "right",
     span: 1,
   },
   {
-    src: "/images/hero-side-4.png",
+    src: "/images/hero/unified_r1_c4.jpg",
     alt: "Modern architecture at night",
     position: "right",
     span: 1,
@@ -39,66 +40,59 @@ export function HeroSection() {
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
-      
+
       const rect = sectionRef.current.getBoundingClientRect();
       const scrollableHeight = window.innerHeight * 2;
       const scrolled = -rect.top;
       const progress = Math.max(0, Math.min(1, scrolled / scrollableHeight));
-      
+
       setScrollProgress(progress);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-    
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Text fades out first (0 to 0.2)
-  const textOpacity = Math.max(0, 1 - (scrollProgress / 0.2));
-  
-  // Image transforms start after text fades (0.2 to 1)
-  const imageProgress = Math.max(0, Math.min(1, (scrollProgress - 0.2) / 0.8));
-  
-  // Smooth interpolations - More balanced distribution
-  const centerWidth = 100 - (imageProgress * 80); // 100% to 20% (same as each side image)
-  const centerHeight = 100; // Always 100% height
-  const sideWidth = imageProgress * 40; // 0% to 40% (20% per image, 2 images = 40%)
-  const sideOpacity = imageProgress;
-  const sideTranslateLeft = -100 + (imageProgress * 100); // -100% to 0%
-  const sideTranslateRight = 100 - (imageProgress * 100); // 100% to 0%
-  const borderRadius = 0; // No border radius
-  const gap = imageProgress * 8; // 0px to 8px
-  
-  // Vertical offset for side columns to move them up on mobile
-  const sideTranslateY = -(imageProgress * 15); // Move up by 15% when fully expanded
+  // TEXT fades out first (0 to 0.2)
+  const textOpacity = Math.max(0, 1 - scrollProgress / 0.2);
+
+  // ANIMATION starts after (0.2 to 1.0)
+  const animationProgress = Math.max(0, Math.min(1, (scrollProgress - 0.2) / 0.8));
+
+  // Side columns animation
+  const sideWidth = animationProgress * 35; // Grows from 0% to 35% each side
+  const sideOpacity = animationProgress;
+
+  const sideTranslateLeft = -100 + animationProgress * 100; // Slides in from left
+  const sideTranslateRight = 100 - animationProgress * 100; // Slides in from right
+
+  // Polish
+  const borderRadius = 0;
+  const gap = animationProgress * 4;
 
   return (
     <section ref={sectionRef} className="relative bg-background">
-      {/* Sticky container for scroll animation */}
+      {/* Sticky container */}
       <div className="sticky top-0 h-screen overflow-hidden">
         <div className="flex h-full w-full items-center justify-center">
-          {/* Bento Grid Container */}
-          <div 
+          <div
             className="relative flex h-full w-full items-stretch justify-center"
-            style={{ gap: `${gap}px` }}
+            style={{ gap: `${gap}px`, overflow: "hidden" }}
           >
-            
-            {/* Left Column */}
-            <div 
-              className="flex h-full flex-row will-change-transform"
+            {/* LEFT COLUMN - Side images */}
+            <div
+              className="flex h-full flex-row will-change-transform gap-2"
               style={{
                 width: `${sideWidth}%`,
-                gap: `${gap}px`,
-                transform: `translateX(${sideTranslateLeft}%) translateY(${sideTranslateY}%)`,
+                transform: `translateX(${sideTranslateLeft}%)`,
                 opacity: sideOpacity,
               }}
             >
               {sideImages.filter(img => img.position === "left").map((img, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="relative h-full overflow-hidden will-change-transform"
                   style={{
                     flex: img.span,
@@ -106,29 +100,39 @@ export function HeroSection() {
                   }}
                 >
                   <Image
-                    src={img.src || "/placeholder.svg"}
+                    src={img.src}
                     alt={img.alt}
                     fill
                     className="object-cover"
+                    priority
                   />
                 </div>
               ))}
             </div>
 
-            {/* Main Hero Image - Center */}
-            <div 
-              className="relative overflow-hidden will-change-transform"
+            {/* CENTER - Video */}
+            <div
+              className="relative overflow-hidden will-change-transform  flex-1"
               style={{
-                width: `${centerWidth}%`,
-                height: `${centerHeight}%`,
-                flex: "0 0 auto",
                 borderRadius: `${borderRadius}px`,
               }}
             >
-              {/* Text Behind - Fades out first */}
-              <div 
+              {/* VIDEO PLAYER */}
+              <VideoPlayer
+                src="https://video.gumlet.io/67690fd82fbe90b354d66613/69df56c2e034f96e26cd6deb/download.mp4"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{
+                  opacity: 1 - animationProgress * 0.3,
+                }}
+                autoPlay
+                loop
+                muted
+              />
+
+              {/* Text overlay */}
+              <div
                 className="absolute inset-0 z-0 flex items-center justify-center"
-                style={{ opacity: textOpacity, transform: 'translateY(-200px)' }}
+                style={{ opacity: textOpacity, transform: "translateY(-200px)" }}
               >
                 <h1 className="whitespace-nowrap text-[35vw] font-bold leading-[0.8] tracking-tighter text-black">
                   {word.split("").map((letter, index) => (
@@ -137,8 +141,8 @@ export function HeroSection() {
                       className="inline-block animate-[slideUp_0.8s_ease-out_forwards] opacity-0"
                       style={{
                         animationDelay: `${index * 0.08}s`,
-                        transition: 'all 1.5s',
-                        transitionTimingFunction: 'cubic-bezier(0.86, 0, 0.07, 1)',
+                        transition: "all 1.5s",
+                        transitionTimingFunction: "cubic-bezier(0.86, 0, 0.07, 1)",
                       }}
                     >
                       {letter}
@@ -146,29 +150,20 @@ export function HeroSection() {
                   ))}
                 </h1>
               </div>
-              
-              <Image
-                src="/images/hero-mono.png"
-                alt="Modern architectural structure with reflection"
-                fill
-                className="absolute inset-0 z-10 object-cover"
-                priority
-              />
             </div>
 
-            {/* Right Column */}
-            <div 
-              className="flex h-full flex-row will-change-transform"
+            {/* RIGHT COLUMN - Side images */}
+            <div
+              className="flex h-full flex-row will-change-transform gap-2"
               style={{
                 width: `${sideWidth}%`,
-                gap: `${gap}px`,
-                transform: `translateX(${sideTranslateRight}%) translateY(${sideTranslateY}%)`,
+                transform: `translateX(${sideTranslateRight}%)`,
                 opacity: sideOpacity,
               }}
             >
               {sideImages.filter(img => img.position === "right").map((img, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="relative h-full overflow-hidden will-change-transform"
                   style={{
                     flex: img.span,
@@ -176,21 +171,21 @@ export function HeroSection() {
                   }}
                 >
                   <Image
-                    src={img.src || "/placeholder.svg"}
+                    src={img.src}
                     alt={img.alt}
                     fill
                     className="object-cover"
+                    priority
                   />
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       </div>
 
-      {/* Tagline Section - Fixed at bottom */}
-      <div 
+      {/* Tagline */}
+      <div
         className="pointer-events-none fixed bottom-0 left-0 right-0 z-10 px-6 pb-12 md:px-12 md:pb-16 lg:px-20 lg:pb-20"
         style={{ opacity: textOpacity }}
       >
@@ -201,7 +196,7 @@ export function HeroSection() {
         </p>
       </div>
 
-      {/* Scroll space to enable animation */}
+      {/* Scroll space */}
       <div className="h-[200vh]" />
     </section>
   );
