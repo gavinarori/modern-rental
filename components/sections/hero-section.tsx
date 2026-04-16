@@ -114,7 +114,6 @@ export function HeroSection() {
             <div
               className="relative overflow-hidden will-change-transform  flex-1"
               style={{
-                borderRadius: `${borderRadius}px`,
               }}
             >
               {/* VIDEO PLAYER */}

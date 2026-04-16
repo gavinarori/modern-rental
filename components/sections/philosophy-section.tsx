@@ -65,24 +65,24 @@ export function PhilosophySection() {
   return (
     <section id="products" className="relative overflow-hidden">
 
-      {/* ✅ BACKGROUND */}
+      {/* BACKGROUND — zoomed out, far away */}
       <div
         className="absolute inset-0 z-0 will-change-transform"
         style={{
-          transform: `scale(${1 + titleOpacity * 0.1})`, // 🔥 subtle zoom
+          transform: `scale(${0.82 + titleOpacity * 0.12})`, // starts zoomed out, gently drifts in
         }}
       >
         <Image
           src="/images/m4 model.webp"
           alt="Background"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      {/* ✅ CONTENT */}
+      {/* CONTENT */}
       <div className="relative z-10">
 
         {/* Scroll Section */}
@@ -102,7 +102,7 @@ export function PhilosophySection() {
                     minHeight: "150px",
                   }}
                 >
-                  {titles.map((title, index) => { 
+                  {titles.map((title, index) => {
                     const isLastText = index === titles.length - 1;
 
                     const segmentSize = 1 / titles.length;
