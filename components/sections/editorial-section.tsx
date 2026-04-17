@@ -79,7 +79,7 @@ export function EditorialSection() {
             WebkitBackfaceVisibility: 'hidden',
             willChange: 'transform',
           }}
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/27eb7fb4-0105-4010-ac9e-0ac977a31b05_1-FZ89nvBAAsR3caRJbhYv7T2mjBofth.mp4"
+          src="https://video.gumlet.io/67690fd82fbe90b354d66613/69e20cc9d04993c17eb28824/download.mp4"
         />
       </div>
 
