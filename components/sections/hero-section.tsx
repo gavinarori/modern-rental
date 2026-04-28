@@ -34,24 +34,57 @@ const sideImages = [
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [hideText, setHideText] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
+
       const rect = sectionRef.current.getBoundingClientRect();
       const scrollableHeight = window.innerHeight * 2;
       const scrolled = -rect.top;
+
       const progress = Math.max(0, Math.min(1, scrolled / scrollableHeight));
       setScrollProgress(progress);
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const textOpacity = Math.max(0, 1 - scrollProgress / 0.2);
-  const animationProgress = Math.max(0, Math.min(1, (scrollProgress - 0.2) / 0.8));
+  // Hide giant M3 after 4 seconds once video starts
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let timer: NodeJS.Timeout;
+
+    const handlePlay = () => {
+      timer = setTimeout(() => {
+        setHideText(true);
+      }, 4000);
+    };
+
+    video.addEventListener("play", handlePlay);
+
+    return () => {
+      video.removeEventListener("play", handlePlay);
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const textOpacity = hideText ? 0 : Math.max(0, 1 - scrollProgress / 0.2);
+
+  const animationProgress = Math.max(
+    0,
+    Math.min(1, (scrollProgress - 0.2) / 0.8)
+  );
+
   const sideWidth = animationProgress * 35;
   const sideOpacity = animationProgress;
   const sideTranslateLeft = -100 + animationProgress * 100;
@@ -75,34 +108,44 @@ export function HeroSection() {
                 opacity: sideOpacity,
               }}
             >
-              {sideImages.filter(img => img.position === "left").map((img, idx) => (
-                <div
-                  key={idx}
-                  className="relative h-full overflow-hidden will-change-transform"
-                  style={{ flex: img.span }}
-                >
-                  <Image src={img.src} alt={img.alt} fill className="object-cover" priority />
-                </div>
-              ))}
+              {sideImages
+                .filter((img) => img.position === "left")
+                .map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="relative h-full overflow-hidden"
+                    style={{ flex: img.span }}
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                ))}
             </div>
 
-            {/* CENTER - Video */}
-            <div className="relative overflow-hidden will-change-transform flex-1">
+            {/* CENTER VIDEO */}
+            <div className="relative overflow-hidden flex-1">
               <video
+                ref={videoRef}
                 autoPlay
                 loop
                 muted
                 playsInline
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ opacity: 1 - animationProgress * 0.3 }}
-                src="https://video.gumlet.io/67690fd82fbe90b354d66613/69df56c2e034f96e26cd6deb/download.mp4"
+                src="/images/BMW_M3_Family_MASTER_HD.mp4"
               />
-              {/* Dark overlay for text contrast */}
+
+              {/* Overlay */}
               <div className="absolute inset-0 bg-black/30" />
 
-              {/* M3 Giant Text */}
+              {/* Giant M3 */}
               <div
-                className="absolute inset-0 z-10 flex items-center justify-center"
+                className="absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-1000"
                 style={{ opacity: textOpacity }}
               >
                 <h1
@@ -119,16 +162,17 @@ export function HeroSection() {
 
               {/* Subtitle */}
               <div
-                className="absolute bottom-12 left-0 right-0 z-10 text-center"
+                className="absolute bottom-12 left-0 right-0 z-10 text-center transition-opacity duration-1000"
                 style={{ opacity: textOpacity }}
               >
                 <p
-                  className="text-xs uppercase tracking-[0.4em] text-white/60 mb-3"
+                  className="mb-3 text-xs uppercase tracking-[0.4em] text-white/60"
                   style={{ fontFamily: "monospace" }}
                 >
                   BMW M GmbH · Since 1992
                 </p>
-                <p className="text-white text-xl md:text-2xl font-light tracking-wide">
+
+                <p className="text-xl font-light tracking-wide text-white md:text-2xl">
                   The icon. Evolved.
                 </p>
               </div>
@@ -143,22 +187,27 @@ export function HeroSection() {
                 opacity: sideOpacity,
               }}
             >
-              {sideImages.filter(img => img.position === "right").map((img, idx) => (
-                <div
-                  key={idx}
-                  className="relative h-full overflow-hidden will-change-transform"
-                  style={{ flex: img.span }}
-                >
-                  <Image src={img.src} alt={img.alt} fill className="object-cover" priority />
-                </div>
-              ))}
+              {sideImages
+                .filter((img) => img.position === "right")
+                .map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="relative h-full overflow-hidden"
+                    style={{ flex: img.span }}
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                ))}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Tagline */}
-      
 
       <div className="h-[200vh]" />
     </section>
