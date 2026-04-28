@@ -1,14 +1,17 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Barlow } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: '--font-barlow',
+});
 
 export const metadata: Metadata = {
-  title: 'EVASION',
-  description: 'High-performance outdoor gear engineered for the modern explorer. Lightweight, durable, adventure-ready.',
-  generator: 'v0.app',
+  title: 'BMW M3 — The Icon. Evolved.',
+  description: 'The BMW M3 Competition xDrive. 510 hp. Twin-turbo inline-six. Born on the Nürburgring. Engineered without compromise.',
   icons: {
     icon: [
       {
@@ -26,6 +29,11 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
+  openGraph: {
+    title: 'BMW M3 — The Icon. Evolved.',
+    description: '510 hp. Twin-turbo. Born on the Nürburgring.',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
@@ -35,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${barlow.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

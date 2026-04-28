@@ -60,7 +60,7 @@ export function PhilosophySection() {
         style={{ transform: `scale(${0.82 + titleOpacity * 0.12})` }}
       >
         <Image
-          src="/images/m4 model.webp"
+          src="/images/bmw-m3-generationen-hd-02.avif"
           alt="BMW M3 Competition in motion"
           fill
           className="object-cover object-center"
