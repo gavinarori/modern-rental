@@ -38,6 +38,7 @@ export function HeroSection() {
 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [hideText, setHideText] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +58,34 @@ export function HeroSection() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Hide giant M3 after 4 seconds once video starts
+  // Force preload + start immediately
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.load();
+
+    const playVideo = async () => {
+      try {
+        await video.play();
+      } catch (error) {
+        console.log("Autoplay blocked:", error);
+      }
+    };
+
+    const handleCanPlay = () => {
+      setVideoLoaded(true);
+      playVideo();
+    };
+
+    video.addEventListener("canplaythrough", handleCanPlay);
+
+    return () => {
+      video.removeEventListener("canplaythrough", handleCanPlay);
+    };
+  }, []);
+
+  // Hide giant M3 after 4 sec once video starts
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -128,17 +156,28 @@ export function HeroSection() {
             </div>
 
             {/* CENTER VIDEO */}
-            <div className="relative overflow-hidden flex-1">
+            <div className="relative overflow-hidden flex-1 bg-black">
+              {!videoLoaded && (
+                <div className="absolute inset-0 z-20 animate-pulse bg-zinc-900" />
+              )}
+
               <video
                 ref={videoRef}
+                preload="auto"
                 autoPlay
-                loop
                 muted
+                loop
                 playsInline
-                className="absolute inset-0 h-full w-full object-cover"
-                style={{ opacity: 1 - animationProgress * 0.3 }}
-                src="/images/BMW_M3_Family_MASTER_HD.mp4"
-              />
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700"
+                style={{
+                  opacity: videoLoaded ? 1 - animationProgress * 0.3 : 0,
+                }}
+              >
+                <source
+                  src="/images/BMW_M3_Family_MASTER_HD.mp4"
+                  type="video/mp4"
+                />
+              </video>
 
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/30" />
